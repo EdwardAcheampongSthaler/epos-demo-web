@@ -1,0 +1,336 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Fingopay PoS Demo </title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+
+
+    <script type="text/javascript" language="javascript">
+
+        var regularExpression = new Object();
+        regularExpression.whitespacepat = "\s+";
+
+
+        /*********************************************************************************
+        Purpose        : Is used to validate user inputs.
+        Parametrs      :
+        Function calls :
+        Return types   :
+        ***********************************************************************************
+        String Table/Code domain name :
+        Dependency					  :
+        ************************************************************************************/
+        function vlidate() {
+            //document.all.status_bar.innerHTML = "";
+            var hiddenFrm = document.forms['frmRegistration'];
+            if (hiddenFrm.txtName.value == "" && document.getElementById('DropDownList2').value != "4") {
+                alert("Please enter your details!");
+                hiddenFrm.txtName.focus();
+                return false;
+            }
+
+            else {
+                return true;
+            }
+        }
+
+        /*********************************************************************************
+        Purpose        : Is used to display message into div.
+        Parametrs      :
+        Function calls :
+        Return types   :
+        ***********************************************************************************
+        String Table/Code domain name :
+        Dependency					  :
+        ************************************************************************************/
+        function DisplayMessage() {
+            if (frmRegistration.hidMessage.value != null)
+                document.all.status_bar.innerHTML = frmRegistration.hidMessage.value;
+
+        }
+
+        /********************************************************************************
+        Function   		:  isWhitespace
+        Purpose			: Checks for white space
+        Parameters		: Object , String
+        Function calls	: generateArrMessages( String )
+        Return type		: True if valid format, otherwise returns false
+        Dependency		: regularExpression.whitespacepat
+         ********************************************************************************/
+        function isWhitespace(Object) {
+            var strInput = new String(Object.value);
+            if (strInput.length > 0) {
+                var objregExp = new RegExp(regularExpression.whitespacepat);
+                if (objregExp.test(strInput)) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        /********************************************************************************
+        Function   		:  isNumeric
+        Purpose			: Check for numeric field
+        Parameters		: Object ,String
+        Function calls	: generateArrMessages( String ),isWhitespace (Object)
+        Return type		: True if valid , otherwise returns false
+        Dependency		:
+         ********************************************************************************/
+        function isNumeric(Object) {
+            var strInput = new String(Object.value);
+            if (strInput.length > 0) {
+                for (i = 0; i < strInput.length; i++) {
+                    if (strInput.charAt(i) < '0' || strInput.charAt(i) > '9') {
+
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+        }
+
+        function handleForm(event) {
+            event.preventDefault();
+        }
+
+        function PayAndEnroll(toggleMode) {
+
+            try {
+                if (toggleMode == "pay") {
+                    var hiddenFrm = document.forms['frmRegistration'];
+                    hiddenFrm.addEventListener('submit', handleForm); 
+                    hiddenFrm.txtAuthData.value = "";
+
+                    var plugin = document.getElementById('plugin0');
+
+                    var rtnVer = plugin.getVerificationTemplate(30000);
+
+                    if (rtnVer == "Error 0x01000118 in BioAPI_Capture()") {
+                        alert("Scanning cancelled. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer.indexOf("Capture cancelled by user") != -1) {
+                        alert("Scanning cancelled. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer == "Error 0x0100010e in BioAPI_Capture()") {
+                        alert("Scanning timed-out. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer == "Error 0x10000104 in BioAPI initialisation") {
+                        alert("The finger-vein scanner is not connected. Please check the USB cable\r\n or connect the scanner");
+                        return false;
+                    }
+                    else if (rtnVer == "Error 0x00000501 in BioAPI_Capture()" || rtnVer == "Error 0x00000501 in BioAPI_Process()") {
+                        alert("Finger scan failed. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer.indexOf("0x020") != -1 || rtnVer == "Error 0x00000205 in BioAPI initialisation") {
+                        alert("The finger-vein scanner is not connected. Please check the USB cable\r\n or connect the scanner");
+                        return false;
+                    }
+                    if ("" == rtnVer) {
+
+                        alert("Capture failed, Please re-scan");
+                        return;
+                    } else {
+
+                        hiddenFrm.txtAuthData.value = rtnVer;
+
+                    }
+                    hiddenFrm.submit();
+                }
+
+                else { //enroll and verify then pay
+
+                    var plugin = document.getElementById('plugin0');
+                    var hiddenFrm = document.forms['frmRegistration'];
+                    hiddenFrm.addEventListener('submit', handleForm); 
+                    var rtnEnr = plugin.getEnrolmentTemplate(0, 20000);
+
+
+                    if (rtnEnr == "Error 0x01000118 in BioAPI_Enroll()") {
+                        alert("Scanning cancelled. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnEnr == "Error 0x0100010e in BioAPI_Enroll()") {
+                        alert("Scanning timed-out. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnEnr.indexOf("Capture cancelled by user") != -1) {
+                        alert("Scanning cancelled. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnEnr == "Error 0x10000104 in BioAPI initialisation") {
+                        alert("The finger-vein scanner is not connected. Please check the USB cable\r\n or connect the scanner");
+                        return false;
+                    }
+                    else if (rtnEnr == "Error 0x00000501 in BioAPI_Enroll()") {
+                        alert("Finger scan failed. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnEnr == "Error 0x02000011 in BioAPI_Enroll()" || rtnEnr == "Error 0x00000205 in BioAPI initialisation") {
+                        alert("The finger-vein scanner is not connected. Please check the USB cable\r\n or connect the scanner");
+                        return false;
+                    }
+
+                    var rtnVer = plugin.verifyAfterEnrol(0, 20000, 600);
+
+                    if (rtnVer == "Error 0x01000118 in BioAPI_Capture()") {
+                        alert("Scanning cancelled. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer.indexOf("close enough match to enrolment captures") != -1) {
+                        alert("Verification capture was not a close enough match to enrolment captures");
+                        return false;
+                    }
+                    else if (rtnVer.indexOf("Capture cancelled by user") != -1) {
+                        alert("Scanning cancelled. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer == "Error 0x0100010e in BioAPI_Capture()") {
+                        alert("Scanning timed-out. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer == "Error 0x10000104 in BioAPI initialisation") {
+                        alert("The finger-vein scanner is not connected. Please check the USB cable\r\n or connect the scanner");
+                        return false;
+                    }
+                    else if (rtnVer == "Error 0x00000501 in BioAPI_Capture()" || rtnVer == "Error 0x00000501 in BioAPI_Process()") {
+
+                        alert("Finger scan failed. Please re-scan");
+                        return false;
+                    }
+                    else if (rtnVer == "Error 0x02000011 in BioAPI_Enroll()" || rtnVer == "Error 0x00000205 in BioAPI initialisation") {
+                        alert("The finger-vein scanner is not connected. Please check the USB cable\r\n or connect the scanner");
+                        return false;
+                    }
+                    if ("" == rtnEnr && "" == rtnVer) {
+
+                        alert("Capture failed, Please re-scan");
+                        return false;
+                    }
+                    else {
+
+                        //alert("Scanning of the finger success!");
+                        hiddenFrm.txtAuthData.value = rtnEnr;
+                        hiddenFrm.txtVerifyData.value = rtnVer;
+                      
+
+                        //alertConfirm();
+                        hiddenFrm.action = "home/EnrollAndPay";
+
+                        hiddenFrm.addEventListener('submit', handleForm); 
+                        hiddenFrm.submit();
+                    }
+                }
+
+            } catch (e) {
+                var errmsg = e.message;
+                // Scanning timeout (0100010e is J300 and 0000F302 is J2xx)
+                if (errmsg.search(/\[0100010e\]/i) != -1 || errmsg.search(/\[0000F302\]/i) != -1) {
+                    alert("Scanning has timed out. Please re-scan");
+                    // Missing device
+                } else if (errmsg.search(/\[0000f001\]/i) != -1) {
+                    alert("The device is not connected. Please check the USB cable.");
+                    // Foreign matter detected (J300)
+                } else if (errmsg.search(/\[00000501\]/i) != -1) {
+                    alert("Scanning of the finger failed. Please re-scan.");
+                } else {
+                    alert("An error occurred." + errmsg);
+                }
+                return false;
+            }
+
+           
+           // hiddenFrm.submit();
+        }
+
+    </script>
+
+</head>
+<body>
+    <form id="frmRegistration" name="frmRegistration" method="POST" action="home/MakeFingerPayment" enctype="application/x-www-form-urlencoded"
+          onsubmit="handleForm">
+
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">PoS Demo</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-area="" asp-controller="Pay" asp-action="Index">Pay</a></li>
+                        @*<li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+        <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>*@
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <partial name="_CookieConsentPartial" />
+
+        <div class="container body-content">
+            @RenderBody()
+            <hr />
+            <footer>
+                <p>&copy; 2018 - Sthaler</p>
+            </footer>
+        </div>
+
+        <environment include="Development">
+            <script src="~/lib/jquery/dist/jquery.js"></script>
+            <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+            <script src="~/js/site.js" asp-append-version="true"></script>
+        </environment>
+        <environment exclude="Development">
+            <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"
+                    asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                    asp-fallback-test="window.jQuery"
+                    crossorigin="anonymous"
+                    integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT">
+            </script>
+            <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                    asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                    asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                    crossorigin="anonymous"
+                    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+            </script>
+            <script src="~/js/site.min.js" asp-append-version="true"></script>
+        </environment>
+
+        @RenderSection("Scripts", required: false)
+        <object id="plugin0" type="application/x-h1plugin" width="10" height="10">
+            <param name="onload" value="" />
+        </object>
+
+        <input name="txtAuthData" id="txtAuthData" type="hidden" />
+        <input name="txtAccountId" id="txtAccountId" type="hidden" />
+        <input name="txtEnrollmentPin" id="txtEnrollmentPin" type="hidden" />
+        <input name="txtVerifyData" id="txtVerifyData" type="hidden" />
+        <input name="txtAuthDataBackup" id="txtAuthDataBackup" type="hidden" />
+        <input name="txtVerifyDataBackup" id="txtVerifyDataBackup" type="hidden" />
+        @*<input name="txtPersonId" id="txtPersonId" type="hidden" value="<%=usreId%>" />*@
+    </form>
+
+</body>
+</html>

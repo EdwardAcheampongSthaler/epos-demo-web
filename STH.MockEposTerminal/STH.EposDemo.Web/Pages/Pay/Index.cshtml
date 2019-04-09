@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Pay - via Native Plugin";
+}
+
+
+<div class="row">
+    <div class="col-md-3">
+        <h2><< Basket</h2>
+
+        <input type="image" onclick="{PayAndEnroll('pay');};"
+               alt="Register Now" src="~/images/shoppingbasket.png" style="height: 126px" />
+        @*<a href="@Url.Action("MakeFingerPayment","Pay")" id="contactless">
+                <img src="@Url.Content("~/images/shoppingbasket.png")" />
+            </a>*@
+    </div>
+
+    <div class="col-md-3">
+        <h2>Card Payment</h2>
+
+        <input type="image" onclick="{PayAndEnroll('discount');};"
+               alt="Register Now" src="~/images/cardpay.png" style="height: 126px" />
+    </div>
+
+    <div class="col-md-3">
+        <h2>Pay Contactless</h2>
+
+        <input type="image" onclick="{PayAndEnroll('pay');};"
+               alt="Register Now" src="~/images/cotactless.png" style="height: 126px" />
+    </div>
+
+    <div class="col-md-3">
+        <h2>Loyalty Card</h2>
+        <input type="image" onclick="{PayAndEnroll('pay');};"
+               alt="Loyalty Card" src="~/images/loyalty3.png" style="height: 126px" />
+
+        @*<a href="@Url.Action("EnrollAndPay","Pay")" id="EnrollandPay">
+                <img src="@Url.Content("~/images/loyalty3.PNG")" />
+            </a>*@
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <img src="~/images/FGP Long Logo.png" style="border: none; width:100% !important;" />
+
+    </div>
+    <div class="col-md-4"></div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <h2>Verify &amp; Fingopay</h2>
+        <input type="image" onclick="{PayAndEnroll('age'); };"
+               alt="Register Now" src="~/images/ageverify.png" style="height:126px" />
+    </div>
+
+    <div class="col-md-3">
+        <h2>Enroll &amp; Fingopay</h2>
+
+        <input type="image" onclick="{PayAndEnroll('payandenroll');};"
+               alt="Register Now" src="~/images/step-3.png" style="height: 126px" />
+    </div>
+
+    <div class="col-md-3">
+        <h2>Make a Fingopay</h2>
+
+        <input type="image" onclick="{PayAndEnroll('pay'); };"
+               alt="Register Now" src="~/images/makepayment.png" style="height:126px" />
+    </div>
+
+    <div class="col-md-3">
+        <h2>Collect &amp; Fingopay</h2>
+
+        <input type="image" onclick="{PayAndEnroll('loyalty'); };"
+               alt="Register Now" src="~/images/loyalty4.png" style="height:126px" />
+    </div>
+</div>
