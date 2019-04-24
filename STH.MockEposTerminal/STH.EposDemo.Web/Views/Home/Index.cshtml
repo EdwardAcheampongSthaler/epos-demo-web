@@ -123,10 +123,12 @@
     </div>
 
     <div class="col-md-3">
-        <h2>Enroll &amp; Fingopay</h2>
+        <h2>Enrol &amp; Fingopay</h2>
 
-        <input type="image" onclick="{PayAndEnroll('payandenroll');};"
-               alt="Register Now" src="~/images/step-3.png" style="height: 126px" />
+        @*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="getbootstrap">Open modal</button>*@
+
+        <input type="image" 
+               alt="Register Now" src="~/images/step-3.png" style="height: 126px" data-toggle="modal" data-target="#exampleModal"/>
     </div>
 
     <div class="col-md-3">
@@ -141,5 +143,36 @@
 
         <input type="image" onclick="{PayAndEnroll('loyalty'); };"
                alt="Register Now" src="~/images/loyalty4.png" style="height:126px" />
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLabel">Ready to Enrol?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                
+                    <div class="form-group">
+                        <label for="enrollcode" class="col-form-label">Enter Enrolment code:</label>
+                        <input type="text" class="form-control" id="enrollcode">
+                    </div>
+                    <span> OR</span><br/><br/>
+                    <div class="form-group">
+                        <label for="qrCode" class="col-form-label">Scan the below QR Code with Fingopay App:</label><br/>
+                        <img id="qrCode" class="qrcode" src="https://internationalbarcodes.net/wp-content/uploads/2017/04/QR%20code%20example.jpg" />
+                    </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="{PayAndEnroll('payandenroll');};">Send message</button>
+            </div>
+        </div>
     </div>
 </div>
